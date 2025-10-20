@@ -1,12 +1,8 @@
 import Fastify from 'fastify';
-import type { FastifyInstance } from 'fastify';
 import dotenv from 'dotenv';
 import fastifyWs from '@fastify/websocket';
 import fastifyFormBody from '@fastify/formbody';
-import {
-  RealtimeAgent,
-  RealtimeSession,
-} from '@openai/agents/realtime';
+import { RealtimeAgent, RealtimeSession } from '@openai/agents/realtime';
 import { TwilioBackgroundAudioTransport } from './TwilioBackgroundAudioTransport.js';
 import process from 'node:process';
 
@@ -28,18 +24,8 @@ fastify.register(fastifyWs);
 
 // Create a simple demo agent
 const demoAgent = new RealtimeAgent({
-  name: 'Demo Assistant',
-  instructions: `You are a friendly AI assistant demonstrating background audio capabilities. 
-  
-Keep your responses concise and natural. When you pause between responses, 
-ambient background audio will play automatically to create a more immersive experience.
-
-Greet the caller when they connect and ask how you can help them today.`,
-});
-
-// Root Route
-fastify.get('/', async () => {
-  return { status: 'ok', message: 'Twilio OpenAI Background Audio Server' };
+  name: 'Assistant',
+  instructions: `You are a friendly AI assistant`,
 });
 
 // Incoming call route - returns TwiML to connect to media stream
@@ -61,8 +47,8 @@ fastify.register(async (scopedFastify: FastifyInstance) => {
     { websocket: true },
     async (connection: any) => {
       try {
-        console.log('📞 Client connected to media stream');
-        
+        console.log('📞 Call connected to media stream');
+
         // Initialize the custom transport with background audio
         const twilioTransport = new TwilioBackgroundAudioTransport({ 
           twilioWebSocket: connection 
@@ -70,20 +56,7 @@ fastify.register(async (scopedFastify: FastifyInstance) => {
 
         const session = new RealtimeSession(demoAgent, {
           transport: twilioTransport,
-          model: 'gpt-realtime',
-          config: {
-            turnDetection: {
-              type: 'semantic_vad',
-              eagerness: 'medium',
-              createResponse: true,
-              interruptResponse: true,
-            },
-            audio: {
-              output: {
-                voice: 'alloy',
-              },
-            },
-          },
+          model: 'gpt-realtime-mini',
         });
 
         // Setup session listeners for background audio
@@ -100,18 +73,17 @@ fastify.register(async (scopedFastify: FastifyInstance) => {
 });
 
 // Start server
-fastify.listen({ port: PORT, host: '0.0.0.0' }, (err: Error | null) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-  console.log(`\n🚀 Server listening on port ${PORT}`);
-  console.log(`📡 WebSocket endpoint: ws://localhost:${PORT}/media-stream`);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n👋 Shutting down gracefully...');
-  fastify.close();
-  process.exit(0);
-});
+fastify.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    console.log(`\n🚀 Server listening on port ${PORT}`);
+  });
+  
+  // Graceful shutdown
+  process.on('SIGINT', () => {
+    console.log('\n👋 Shutting down gracefully...');
+    fastify.close();
+    process.exit(0);
+  });
