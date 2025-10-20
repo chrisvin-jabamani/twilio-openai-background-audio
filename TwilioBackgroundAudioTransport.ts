@@ -184,9 +184,7 @@ export class TwilioBackgroundAudioTransport extends TwilioRealtimeTransportLayer
       session.on('transport_event', (event: any) => {
         try {
           if (event.type === 'response.done') {
-            setTimeout(() => {
-              this.sendEndOfAudioMark();
-            }, 100);
+            this.sendEndOfAudioMark();
           }
         } catch (err) {
           console.error('Error handling transport_event:', err);
