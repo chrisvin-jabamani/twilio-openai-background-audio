@@ -2,7 +2,7 @@
 
 Add realistic background audio to speech-to-speech voice agents using OpenAI's Realtime API and Twilio.
 
-**📖 [Read the technical writeup]([https://your-blog-link.com](https://chrisvin.substack.com/p/background-audio-for-speech-to-speech))**
+**📖 [Read the technical writeup](https://chrisvin.substack.com/p/background-audio-for-speech-to-speech)**
 
 ---
 
@@ -82,7 +82,7 @@ A sample file is included: `sample-background-mulaw-8khz.raw`
 2. **Playback Detection** - Uses Twilio mark events to detect when audio finishes playing to caller
 3. **Buffer Management** - Sends `clear` event before agent speech to prevent audio overlap
 
-**📖 [Full technical details](https://your-blog-link.com)**
+**📖 [Full technical details](https://chrisvin.substack.com/p/background-audio-for-speech-to-speech)**
 
 ---
 
